@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QUOTE GENERATOR [ RANDOM ]</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #444;
+      color: #2b2120;
+    }
+
+    .container {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+
+    .logo-container {
+      border: 2px solid #675646;
+      border-radius: 20px;
+      padding: 20px;
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .logo {
+      width: 200px;
+      height: auto;
+    }
+
+    .quote-container {
+      background-color: #92bddf;
+      border-radius: 10px;
+      padding: 30px;
+      box-shadow: 0 10px 30px rgba(103, 86, 70, 0.5);
+      text-align: center;
+      max-width: 600px;
+      margin-top: 20px;
+    }
+
+    #quote-content {
+      font-size: 2rem;
+      font-weight: bold;
+      margin-bottom: 20px;
+    }
+
+    #quote-author {
+      font-style: italic;
+    }
+
+    #new-quote-btn {
+      margin-top: 40px;
+      padding: 15px 30px;
+      font-size: 1.2rem;
+      border: none;
+      border-radius: 30px;
+      background-color: #675646;
+      color: #ffffff;
+      cursor: pointer;
+      transition: background-color 0.3s ease, transform 0.3s ease;
+    }
+
+    #new-quote-btn:hover {
+      background-color: #2b2120;
+      transform: translateY(-3px);
+    }
+
+    #copy-btn {
+      margin-top: 20px;
+      padding: 10px 20px;
+      font-size: 1rem;
+      border: none;
+      border-radius: 30px;
+      background-color: #675646;
+      color: #ffffff;
+      cursor: pointer;
+      transition: background-color 0.3s ease, transform 0.3s ease;
+    }
+
+    #popup-message {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-color: #edead7;
+      color: #ffffff;
+      padding: 20px 30px;
+      border-radius: 20px;
+      font-size: 2rem;
+      text-align: center;
+      display: none;
+      text-shadow: 0 0 10px #00f0ff, 0 0 20px #f609f6, 0 0 30px #f6ff00;
+    }
+
+    @media screen and (max-width: 600px) {
+      .quote-container {
+        padding: 20px;
+        font-size: 1.5rem;
+      }
+
+      #quote-content {
+        font-size: 1.5rem;
+        margin-bottom: 15px;
+      }
+
+      #quote-author {
+        font-size: 1rem;
+      }
+
+      #new-quote-btn {
+        margin-top: 30px;
+        padding: 10px 20px;
+        font-size: 1rem;
+      }
+
+      #copy-btn {
+        margin-top: 15px;
+        padding: 8px 16px;
+        font-size: 0.8rem;
+      }
+
+      #popup-message {
+        font-size: 1.5rem;
+        padding: 15px 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="logo-container">
+      <img src="https://imgur.com/agWFopf.png" alt="Logo" class="logo">
+    </div>
+    <div class="quote-container">
+      <div id="quote-content">WAIT GENERATING</div>
+      <div id="quote-author"></div>
+    </div>
+    <button id="new-quote-btn">GENERATE</button>
+    <button id="copy-btn">COPY QUOTE</button>
+    <div id="popup-message"></div>
+  </div>
+
+  <script>
+    function fetchQuote() {
+      const quoteContent = document.getElementById('quote-content');
+      const quoteAuthor = document.getElementById('quote-author');
+
+      quoteContent.textContent = 'WAIT GENERATING';
+      quoteAuthor.textContent = '';
+
+      fetch('/random-quote')
+        .then(response => response.json())
+        .then(data => {
+          const quoteParts = data.quote.split('\n\n');
+          quoteContent.textContent = quoteParts[0];
+          quoteAuthor.textContent = quoteParts[1];
+        })
+        .catch(error => {
+          quoteContent.textContent = 'An error occurred while fetching the quote. Please try again.';
+          console.error('Error fetching quote:', error);
+        });
+    }
+
+    document.getElementById('new-quote-btn').addEventListener('click', fetchQuote);
+    fetchQuote();
+
+    document.getElementById('copy-btn').addEventListener('click', function() {
+      const quoteContent = document.getElementById('quote-content').textContent;
+      navigator.clipboard.writeText(quoteContent).then(function() {
+        console.log('Quote copied to clipboard:', quoteContent);
+        const popupMessage = document.getElementById('popup-message');
+        popupMessage.textContent = 'THE QUOTE IS COPIED';
+        popupMessage.style.display = 'block';
+        setTimeout(function() {
+          popupMessage.style.display = 'none';
+        }, 2000);
+      }, function(error) {
+        console.error('Error copying quote to clipboard:', error);
+        alert('Failed to copy quote. Please try again.');
+      });
+    });
+  </script>
+</body>
+</html>
